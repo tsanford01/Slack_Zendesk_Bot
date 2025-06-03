@@ -51,7 +51,7 @@ The solution helps support teams quickly access and summarize Zendesk tickets wi
 
 ```bash
 git clone <REPO_URL>  # or download the project files
-cd slack-zendesk-bot
+cd Slack_Zendesk_Bot
 npm install
 ```
 
