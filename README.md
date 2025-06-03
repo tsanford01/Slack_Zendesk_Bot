@@ -24,7 +24,7 @@ A powerful Slack bot that integrates with Zendesk for ticket management and prov
 1. Clone the repository:
    ```bash
    git clone <repository-url>
-   cd slack-zendesk-bot
+   cd Slack_Zendesk_Bot
    ```
 
 2. Install dependencies:
