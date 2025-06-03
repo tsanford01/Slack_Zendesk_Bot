@@ -11,7 +11,7 @@ const errorHandler = async ({ error, logger }) => {
 };
 
 const logMiddleware = async ({ logger, context, next }) => {
-  // Add timestamp to the context
+  // Record start time for logging
   const startTime = new Date().getTime();
   
   // Continue processing the request
