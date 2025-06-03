@@ -55,7 +55,7 @@ class ZendeskClient {
     );
     
     return {
-      results: response.results.map(this.formatTicketResponse),
+      results: response.results.map(ticket => this.formatTicketResponse(ticket)),
       count: response.count
     };
   }
