@@ -48,8 +48,22 @@ describe('RateLimiter', () => {
   test('should calculate remaining time correctly', () => {
     rateLimiter.isRateLimited(userId);
     const remainingTime = rateLimiter.getRemainingTime(userId);
-    
+
     expect(remainingTime).toBeGreaterThan(0);
     expect(remainingTime).toBeLessThanOrEqual(100);
+  });
+
+  test('should clean expired requests after limit is reached', async () => {
+    // Hit the limit
+    expect(rateLimiter.isRateLimited(userId)).toBe(false);
+    expect(rateLimiter.isRateLimited(userId)).toBe(false);
+    expect(rateLimiter.isRateLimited(userId)).toBe(true);
+
+    // Wait for the time window to pass
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // Remaining time should be zero once requests have expired
+    expect(rateLimiter.getRemainingTime(userId)).toBe(0);
+    expect(rateLimiter.isRateLimited(userId)).toBe(false);
   });
 });
