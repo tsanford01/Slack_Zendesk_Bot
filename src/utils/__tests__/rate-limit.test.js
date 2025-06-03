@@ -66,4 +66,17 @@ describe('RateLimiter', () => {
     expect(rateLimiter.getRemainingTime(userId)).toBe(0);
     expect(rateLimiter.isRateLimited(userId)).toBe(false);
   });
+
+
+  test('should return 0 remaining time with no requests or after window', async () => {
+    // No requests made yet
+    expect(rateLimiter.getRemainingTime(userId)).toBe(0);
+
+    // Make a request and wait for the window to expire
+    rateLimiter.isRateLimited(userId);
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    expect(rateLimiter.getRemainingTime(userId)).toBe(0);
+  });
+
 });
