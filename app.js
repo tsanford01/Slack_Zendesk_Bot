@@ -1,4 +1,26 @@
 require('dotenv').config();
+
+// List of required environment variables
+const requiredEnvVars = [
+  'SLACK_BOT_TOKEN',
+  'SLACK_SIGNING_SECRET',
+  'ZENDESK_DOMAIN',
+  'ZENDESK_EMAIL',
+  'ZENDESK_API_TOKEN',
+  'OPENAI_API_KEY'
+];
+
+// Check that all required environment variables are present
+function checkEnvVars() {
+  const missing = requiredEnvVars.filter((name) => !process.env[name]);
+  if (missing.length > 0) {
+    console.error(`Missing environment variables: ${missing.join(', ')}`);
+    process.exit(1);
+  }
+}
+
+checkEnvVars();
+
 const { App, LogLevel } = require('@slack/bolt');
 const { ticketDetails, ticketSummary, searchTickets } = require('./src/slack/commands');
 const { errorHandler, logMiddleware } = require('./src/slack/middleware');
