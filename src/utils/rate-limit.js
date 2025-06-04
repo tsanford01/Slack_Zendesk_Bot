@@ -14,8 +14,12 @@ class RateLimiter {
       (timestamp) => now - timestamp < this.timeWindowMs
     );
 
-    // Update stored requests with cleaned list
-    this.requests.set(userId, validRequests);
+    // Update stored requests with cleaned list or delete if none left
+    if (validRequests.length === 0) {
+      this.requests.delete(userId);
+    } else {
+      this.requests.set(userId, validRequests);
+    }
 
     // Check if user has exceeded rate limit
     if (validRequests.length >= this.maxRequests) {
@@ -36,9 +40,14 @@ class RateLimiter {
     const validRequests = userRequests.filter(
       (timestamp) => now - timestamp < this.timeWindowMs
     );
+
+    if (validRequests.length === 0) {
+      this.requests.delete(userId);
+      return 0;
+    }
+
     this.requests.set(userId, validRequests);
 
-    if (validRequests.length === 0) return 0;
 
     const oldestRequest = validRequests[0];
     const timeUntilReset = this.timeWindowMs - (now - oldestRequest);
