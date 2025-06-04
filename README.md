@@ -41,12 +41,13 @@ A powerful Slack bot that integrates with Zendesk for ticket management and prov
    ```
    SLACK_BOT_TOKEN=xoxb-your-token
    SLACK_SIGNING_SECRET=your-signing-secret
-   ZENDESK_DOMAIN=your-subdomain.zendesk.com
-   ZENDESK_EMAIL=your-email
-   ZENDESK_API_TOKEN=your-api-token
-   OPENAI_API_KEY=your-openai-api-key
-   PORT=3000
-   ```
+    ZENDESK_DOMAIN=your-subdomain.zendesk.com
+    ZENDESK_EMAIL=your-email
+    ZENDESK_API_TOKEN=your-api-token
+    OPENAI_API_KEY=your-openai-api-key
+    OPENAI_MODEL=
+    PORT=3000
+    ```
 
 ## Development
 

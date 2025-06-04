@@ -8,6 +8,7 @@ const { MAX_HISTORY_LENGTH } = OpenAIClient;
 
 describe('OpenAIClient', () => {
   beforeEach(() => {
+    delete process.env.OPENAI_MODEL;
     createMock.mockReset();
     OpenAI.mockImplementation(() => ({
       chat: { completions: { create: createMock } }
@@ -21,11 +22,12 @@ describe('OpenAIClient', () => {
         choices: [{ message: { content: expected } }]
       });
 
+      process.env.OPENAI_MODEL = 'test-model';
       const client = new OpenAIClient('fake-key');
       const ticket = { id: 1, subject: 'Bug', status: 'open', priority: 'high', description: 'Details' };
 
       const summary = await client.summarizeTicket(ticket, []);
-      expect(createMock).toHaveBeenCalled();
+      expect(createMock).toHaveBeenCalledWith(expect.objectContaining({ model: 'test-model' }));
       expect(summary).toBe(expected);
     });
   });
