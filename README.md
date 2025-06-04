@@ -97,7 +97,7 @@ Get help about available commands or specific command usage.
 ## Project Structure
 
 ```
-slack-zendesk-bot/
+Slack_Zendesk_Bot/
 ├── src/
 │   ├── slack/          # Slack-related functionality
 │   │   ├── commands.js # Command implementations
