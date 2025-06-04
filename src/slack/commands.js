@@ -1,5 +1,6 @@
 const ZendeskClient = require('../zendesk');
 const OpenAIClient = require('../openai');
+const Cache = require('../utils/cache');
 const {
   isValidTicketId,
   validateSearchQuery,
@@ -14,6 +15,7 @@ const zendesk = new ZendeskClient(
 );
 
 const openai = new OpenAIClient(process.env.OPENAI_API_KEY);
+const responseCache = new Cache();
 
 const ticketDetails = async ({ command, ack, respond }) => {
   await ack();
@@ -23,12 +25,20 @@ const ticketDetails = async ({ command, ack, respond }) => {
       await respond(formatErrorMessage('Invalid ticket ID', 'ticket-details'));
       return;
     }
+    const cacheKey = `ticketDetails:${ticketId}`;
+    const cached = responseCache.get(cacheKey);
+    if (cached) {
+      await respond(cached);
+      return;
+    }
 
     // Fetch ticket details from Zendesk
     const ticket = await zendesk.getTicket(ticketId);
-    
+
     // Format and send the response
-    await respond(zendesk.formatTicketForSlack(ticket));
+    const formatted = zendesk.formatTicketForSlack(ticket);
+    responseCache.set(cacheKey, formatted);
+    await respond(formatted);
   } catch (error) {
     console.error('Error in ticket-details command:', error);
     await respond({
@@ -45,6 +55,13 @@ const ticketSummary = async ({ command, ack, respond }) => {
     const ticketId = command.text.trim();
     if (!isValidTicketId(ticketId)) {
       await respond(formatErrorMessage('Invalid ticket ID', 'ticket-summary'));
+      return;
+    }
+
+    const cacheKey = `ticketSummary:${ticketId}`;
+    const cached = responseCache.get(cacheKey);
+    if (cached) {
+      await respond({ replace_original: true, blocks: cached });
       return;
     }
 
@@ -65,7 +82,8 @@ const ticketSummary = async ({ command, ack, respond }) => {
     // Format and send the summary
     const blocks = await openai.generateSummaryBlocks(ticket, summary);
     
-    // Update the message with the summary
+    // Cache and update the message with the summary
+    responseCache.set(cacheKey, blocks);
     await respond({
       replace_original: true,
       blocks
@@ -90,6 +108,13 @@ const searchTickets = async ({ command, ack, respond }) => {
       return;
     }
     const searchQuery = cleaned;
+
+    const cacheKey = `searchTickets:${searchQuery}`;
+    const cached = responseCache.get(cacheKey);
+    if (cached) {
+      await respond(cached);
+      return;
+    }
 
     // Search tickets in Zendesk
     const { results, count } = await zendesk.searchTickets(searchQuery);
@@ -138,7 +163,9 @@ const searchTickets = async ({ command, ack, respond }) => {
       });
     }
 
-    await respond({ blocks });
+    const message = { blocks };
+    responseCache.set(cacheKey, message);
+    await respond(message);
   } catch (error) {
     console.error('Error in search-tickets command:', error);
     await respond({
