@@ -1,12 +1,16 @@
 // OpenAI client wrapper
 const { OpenAI } = require('openai');
 
+// Use configurable model with a sensible default
+const DEFAULT_MODEL = 'gpt-4-turbo-preview';
+
 // Limit the prompt size to prevent exceeding model context limits
 const MAX_HISTORY_LENGTH = 15000; // roughly a few thousand tokens
 
 class OpenAIClient {
   constructor(apiKey) {
     this.client = new OpenAI({ apiKey });
+    this.model = process.env.OPENAI_MODEL || DEFAULT_MODEL;
   }
 
   async summarizeTicket(ticket, comments) {
@@ -23,7 +27,7 @@ Your task is to create a clear, concise summary of the ticket conversation that 
 Keep the summary professional and focused on the most important information.`;
 
       const response = await this.client.chat.completions.create({
-        model: "gpt-4-turbo-preview",
+        model: this.model,
         messages: [
           { role: "system", content: systemPrompt },
           { 
