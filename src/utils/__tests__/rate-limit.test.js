@@ -79,4 +79,12 @@ describe('RateLimiter', () => {
     expect(rateLimiter.getRemainingTime(userId)).toBe(0);
   });
 
+  test('removes user entry after all requests expire', async () => {
+    rateLimiter.isRateLimited(userId);
+    await new Promise(resolve => setTimeout(resolve, 100));
+    // Trigger cleanup
+    rateLimiter.getRemainingTime(userId);
+    expect(rateLimiter.requests.has(userId)).toBe(false);
+  });
+
 });
