@@ -26,7 +26,11 @@ class ZendeskClient {
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({ error: response.statusText }));
-        throw new Error(`Zendesk API Error: ${error.error || response.statusText}`);
+        const err = new Error(
+          `Zendesk API Error: ${error.error || response.statusText}`
+        );
+        err.status = response.status;
+        throw err;
       }
 
       return await response.json();
@@ -41,8 +45,8 @@ class ZendeskClient {
       const { ticket } = await this.makeRequest(`/tickets/${ticketId}.json`);
       return this.formatTicketResponse(ticket);
     } catch (error) {
-      if (error.message.includes('404')) {
-        throw new Error(`Ticket ${ticketId} not found`);
+      if (error.status === 404) {
+        throw new Error('Ticket not found');
       }
       throw error;
     }
