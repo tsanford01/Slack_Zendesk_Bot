@@ -1,5 +1,10 @@
 const ZendeskClient = require('../zendesk');
 const OpenAIClient = require('../openai');
+const {
+  isValidTicketId,
+  validateSearchQuery,
+  formatErrorMessage
+} = require('../utils/validation');
 
 // Initialize clients
 const zendesk = new ZendeskClient(
@@ -14,10 +19,8 @@ const ticketDetails = async ({ command, ack, respond }) => {
   await ack();
   try {
     const ticketId = command.text.trim();
-    if (!ticketId) {
-      await respond({
-        text: "⚠️ Please provide a ticket ID. Usage: `/ticket-details TICKET_ID`"
-      });
+    if (!isValidTicketId(ticketId)) {
+      await respond(formatErrorMessage('Invalid ticket ID', 'ticket-details'));
       return;
     }
 
@@ -40,10 +43,8 @@ const ticketSummary = async ({ command, ack, respond }) => {
   await ack();
   try {
     const ticketId = command.text.trim();
-    if (!ticketId) {
-      await respond({
-        text: "⚠️ Please provide a ticket ID. Usage: `/ticket-summary TICKET_ID`"
-      });
+    if (!isValidTicketId(ticketId)) {
+      await respond(formatErrorMessage('Invalid ticket ID', 'ticket-summary'));
       return;
     }
 
@@ -83,13 +84,12 @@ const ticketSummary = async ({ command, ack, respond }) => {
 const searchTickets = async ({ command, ack, respond }) => {
   await ack();
   try {
-    const searchQuery = command.text.trim();
-    if (!searchQuery) {
-      await respond({
-        text: "⚠️ Please provide search keywords. Usage: `/search-tickets KEYWORDS`"
-      });
+    const { isValid, cleaned, error } = validateSearchQuery(command.text);
+    if (!isValid) {
+      await respond(formatErrorMessage(error, 'search-tickets'));
       return;
     }
+    const searchQuery = cleaned;
 
     // Search tickets in Zendesk
     const { results, count } = await zendesk.searchTickets(searchQuery);
