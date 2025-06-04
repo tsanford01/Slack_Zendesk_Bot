@@ -1,6 +1,9 @@
 // OpenAI client wrapper
 const { OpenAI } = require('openai');
 
+// Limit the prompt size to prevent exceeding model context limits
+const MAX_HISTORY_LENGTH = 15000; // roughly a few thousand tokens
+
 class OpenAIClient {
   constructor(apiKey) {
     this.client = new OpenAI({ apiKey });
@@ -49,13 +52,14 @@ Keep the summary professional and focused on the most important information.`;
     // Add comments in chronological order
     if (comments && comments.length > 0) {
       history += 'Conversation:\n';
-      comments
-        .filter(comment => comment.public) // Only include public comments
-        .forEach(comment => {
-          history += `---\n`;
-          history += `From: ${comment.author}\n`;
-          history += `${comment.body}\n`;
-        });
+      for (const comment of comments.filter(c => c.public)) {
+        const snippet = `---\nFrom: ${comment.author}\n${comment.body}\n`;
+        if (history.length + snippet.length > MAX_HISTORY_LENGTH) {
+          history += '... (truncated due to length)\n';
+          break;
+        }
+        history += snippet;
+      }
     }
 
     return history;
@@ -102,3 +106,4 @@ Keep the summary professional and focused on the most important information.`;
 }
 
 module.exports = OpenAIClient;
+module.exports.MAX_HISTORY_LENGTH = MAX_HISTORY_LENGTH;
