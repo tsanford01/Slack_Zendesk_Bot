@@ -155,8 +155,9 @@ The bot provides clear error messages for common issues:
 1. Fork the repository
 2. Create your feature branch
 3. Write tests for your changes
-4. Ensure all tests pass
-5. Submit a pull request
+4. Commit any updates to `package-lock.json`
+5. Ensure all tests pass
+6. Submit a pull request
 
 ## License
 
