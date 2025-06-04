@@ -62,10 +62,12 @@ npm run test:watch      # Run tests in watch mode
 npm run test:coverage   # Run tests with coverage report
 ```
 
-Run linting:
+Run linting using ESLint:
 ```bash
 npm run lint
 ```
+The linter configuration is defined in `.eslintrc.json` and extends
+`eslint:recommended` with Node and Jest environments.
 
 ## Available Commands
 
