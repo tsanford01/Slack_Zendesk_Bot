@@ -4,6 +4,7 @@ jest.mock('openai', () => ({ OpenAI: jest.fn() }));
 
 const { OpenAI } = require('openai');
 const OpenAIClient = require('../openai');
+const { MAX_HISTORY_LENGTH } = OpenAIClient;
 
 describe('OpenAIClient', () => {
   beforeEach(() => {
@@ -57,6 +58,21 @@ describe('OpenAIClient', () => {
       expect(history).toContain('From: Charlie');
       expect(history).toContain('Another comment');
       expect(history).not.toContain('Private comment');
+    });
+
+    test('truncates history when it grows too long', () => {
+      const client = new OpenAIClient('fake-key');
+      const ticket = { id: 2, subject: 'Overflow', status: 'open', priority: 'low', description: 'd' };
+      const largeBody = 'x'.repeat(MAX_HISTORY_LENGTH);
+      const comments = [
+        { author: 'Tester', body: largeBody, public: true },
+        { author: 'Tester', body: largeBody, public: true }
+      ];
+
+      const history = client.prepareConversationHistory(ticket, comments);
+      expect(history).toContain('Conversation:');
+      expect(history).toContain('... (truncated due to length)');
+      expect(history.length).toBeLessThanOrEqual(MAX_HISTORY_LENGTH + 200); // ticket info adds some chars
     });
   });
 
