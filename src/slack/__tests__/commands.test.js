@@ -1,3 +1,4 @@
+process.env.OPENAI_API_KEY = 'test';
 const { ticketDetails, ticketSummary, searchTickets } = require('../commands');
 const { formatErrorMessage } = require('../../utils/validation');
 
