@@ -1,5 +1,8 @@
 const RateLimiter = require('../rate-limit');
 
+// Ensure real timers are used as other test suites may enable fake timers
+jest.useRealTimers();
+
 describe('RateLimiter', () => {
   let rateLimiter;
   const userId = 'test-user';
