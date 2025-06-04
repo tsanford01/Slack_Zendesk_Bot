@@ -46,7 +46,7 @@ app.command('/search-tickets', searchTickets);
 app.command('/help', helpCommand);
 
 // Health check message
-app.message('ping', async ({ message, say }) => {
+app.message('ping', async ({ say }) => {
   await say({
     text: 'pong',
     blocks: [
