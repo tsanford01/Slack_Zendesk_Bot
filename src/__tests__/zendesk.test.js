@@ -28,4 +28,17 @@ describe('ZendeskClient', () => {
       expect(results[0].url).toBe('https://example.zendesk.com/agent/tickets/123');
     });
   });
+
+  describe('getTicket', () => {
+    test('should throw a Ticket not found error on 404', async () => {
+      const client = new ZendeskClient('example.zendesk.com', 'user@example.com', 'token');
+
+      const err = new Error('Zendesk API Error: Not Found');
+      err.status = 404;
+
+      client.makeRequest = jest.fn().mockRejectedValue(err);
+
+      await expect(client.getTicket(123)).rejects.toThrow('Ticket not found');
+    });
+  });
 });
