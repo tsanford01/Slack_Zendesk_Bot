@@ -96,7 +96,7 @@ This installs the required dependencies, including **@slack/bolt**, **node-fetch
 ## Project Structure
 
 ```
-slack-zendesk-bot/
+Slack_Zendesk_Bot/
 ├─ .env                 # Environment variables (not committed)
 ├─ app.js               # Main application logic
 ├─ package.json         # Node package manifest
